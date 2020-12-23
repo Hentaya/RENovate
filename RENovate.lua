@@ -10,7 +10,7 @@ local GetTime = _G.GetTime
 local GetItemInfo = _G.GetItemInfo
 local GetLandingPageGarrisonType = _G.C_Garrison.GetLandingPageGarrisonType
 local GetAvailableMissions = _G.C_Garrison.GetAvailableMissions
-local GetMissionInfo = _G.C_Garrison.GetMissionInfo
+local GetMissionDeploymentInfo = _G.C_Garrison.GetMissionDeploymentInfo
 local GetMissionLink = _G.C_Garrison.GetMissionLink
 local GetMissionCost = _G.C_Garrison.GetMissionCost
 local GetInProgressMissions = _G.C_Garrison.GetInProgressMissions
@@ -27,7 +27,7 @@ local InCombatLockdown = _G.InCombatLockdown
 local IsCurrencyContainer = _G.C_CurrencyInfo.IsCurrencyContainer
 local SetItemButtonQuality = _G.SetItemButtonQuality
 local AddFollowerToMission = _G.C_Garrison.AddFollowerToMission
-local RemoveFollowerFromMission = _G.C_Garrison.RemoveFollowerFromMission
+local RemoveFollowerFromMission = _G.C_Garrison.RemoveFollowerFromMission									
 local InterfaceOptionsFrame_OpenToCategory = _G.InterfaceOptionsFrame_OpenToCategory
 local HybridScrollFrame_GetOffset = _G.HybridScrollFrame_GetOffset
 local BreakUpLargeNumbers = _G.BreakUpLargeNumbers
@@ -290,7 +290,7 @@ function RE:GetMissionThreats(missionID, parentFrame)
 		RE.MF.abilityCountersForMechanicTypes = GetFollowerAbilityCountersForMechanicTypes(RE.MF.followerTypeID)
 	end
 
-	local enemies = select(8, GetMissionInfo(missionID))
+	local enemies = select(8, GetMissionDeploymentInfo(missionID))
 	local counterableThreats = _G.GarrisonMission_DetermineCounterableThreats(missionID, RE.MF.followerTypeID)
 	local numThreats = 0
 
@@ -299,14 +299,14 @@ function RE:GetMissionThreats(missionID, parentFrame)
 	end
 	for i = 1, #enemies do
 		local enemy = enemies[i]
-		for mechanicID, _ in pairs(enemy.mechanics) do
+		for _, mechanic in pairs(enemy.mechanics) do
 			numThreats = numThreats + 1
 			local threatFrame = parentFrame.Threat[numThreats]
 			local ability = RE.MF.abilityCountersForMechanicTypes[mechanicID]
 			threatFrame.Border:SetShown(_G.ShouldShowFollowerAbilityBorder(RE.MF.followerTypeID, ability))
 			threatFrame.Icon:SetTexture(ability.icon)
 			threatFrame:Show()
-			_G.GarrisonMissionButton_CheckTooltipThreat(threatFrame, missionID, mechanicID, counterableThreats)
+			_G.GarrisonMissionButton_CheckTooltipThreat(threatFrame, missionID, mechanic.mechanicTypeID, counterableThreats)
 		end
 	end
 end
@@ -349,7 +349,7 @@ function RE:GetMissionCounteredThreats(followersOrg, enemies, newFollower)
 end
 
 function RE:GetMissonSlowdown(missionID)
-	local enemies = select(8, GetMissionInfo(missionID))
+	local enemies = select(8, GetMissionDeploymentInfo(missionID))
 	local slowicons = " "
 	for i = 1, #enemies do
 		local enemy = enemies[i]
